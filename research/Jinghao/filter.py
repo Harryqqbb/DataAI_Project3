@@ -19,7 +19,7 @@ df.columns = ['frame_id', 'track_id', 'point_id', 'dx', 'dy', 'dz', 'x', 'y', 'z
 
 df['radial_xy'] = np.sqrt(df['x']**2 + df['y']**2)
 
-filtered = df[(df['radial_xy'] > 0.5) & (df['radial_xy'] < 5.0)]
+filtered = df[(df['radial_xy'] > 0.5)]
 
 # Sort from greatest to least radial XY distance
 filtered_sorted = filtered.sort_values(by='radial_xy', ascending=False)
