@@ -8,23 +8,20 @@ import matplotlib.pyplot as plt
 file_path = "SiHits_3D_pvar_zvar_0.03_0.00_28_0.04_0.06_100_v1.txt"
 df = pd.read_csv(file_path, header=None)
 df.columns = ["event_id", "true_z", "path_id", "point_id", "nx", "ny", "nz", "x", "y", "z"]
-
-# Group by event and path
 grouped = df.groupby(["event_id", "path_id"])
 
 # Dictionary to hold predictions per event
 event_predictions = defaultdict(list)
 event_true_z = {}
 
-# Fit lines in Y-Z plane and estimate vertex by extrapolating to y=0
+# Using Lin. Reg. to guestimate center
 for (event_id, path_id), group in grouped:
-    X = group["y"].values.reshape(-1, 1)
+    z = group["y"].values.reshape(-1, 1)
     y = group["z"].values
-    if len(np.unique(X)) < 2:
-        continue  # Skip if not enough unique points for regression
+    if len(np.unique(z)) < 2:
+        continue
 
-    # Linear regression Z vs Y
-    reg = LinearRegression().fit(X, y)
+    reg = LinearRegression().fit(z, y) 
     z_at_y0 = reg.predict(np.array([[0]]))[0]
     event_predictions[event_id].append(z_at_y0)
     event_true_z[event_id] = group["true_z"].iloc[0]
@@ -36,23 +33,20 @@ for event_id, preds in event_predictions.items():
     for pred_z in preds:
         errors.append(pred_z - true_z)
         
-# Print all comparisons and errors
-for event_id, preds in event_predictions.items():
-    true_z = event_true_z[event_id]
-    for pred_z in preds:
-        error = pred_z - true_z
-        print(f"{event_id:<6} {true_z:>10.4f} {pred_z:>15.4f} {error:>10.4f}")
-
+# # Print all comparisons and errors
+# for event_id, preds in event_predictions.items():
+#     true_z = event_true_z[event_id]
+#     for pred_z in preds:
+#         error = pred_z - true_z
+#         print(f"{event_id:<6} {true_z:>10.4f} {pred_z:>15.4f} {error:>10.4f}")
 
 errors = np.array(errors)
 std_dev = np.std(errors)
-
-# Calculate average error
 mean_error = np.mean(errors)
 
-errors = np.array(errors)  # if not already a NumPy array
+print("Average Error (mean of predicted_z - true_z):", mean_error)
+print("Standard Deviation of Errors:", std_dev)
 
-# Plot histogram
 plt.figure(figsize=(10, 6))
 plt.hist(errors, bins=50, color='steelblue', edgecolor='black')
 plt.title('Histogram of Z Prediction Errors')
@@ -61,7 +55,3 @@ plt.ylabel('Frequency')
 plt.grid(True)
 plt.tight_layout()
 plt.show()
-
-# Output results
-print("Average Error (mean of predicted_z - true_z):", mean_error)
-print("Standard Deviation of Errors:", std_dev)
