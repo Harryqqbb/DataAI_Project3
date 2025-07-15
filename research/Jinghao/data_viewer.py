@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
 # Load data
-data = np.loadtxt('SiHits_3D_pvar_0.02_0.50_100_v0.txt', delimiter=',')
+data = np.loadtxt('filtered_xy_sorted.txt', delimiter=',')
 
 # Extract x, y, z from columns 6, 7, 8
 x = data[:, 6]
