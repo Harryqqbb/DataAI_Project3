@@ -8,8 +8,8 @@ df['radial_xy'] = np.sqrt(df['x']**2 + df['y']**2)
 
 filtered = df[(df['radial_xy'] > 0.5)]
 
-filtered_sorted = filtered.sort_values(by='radial_xy', ascending=False)
+#filtered_sorted = filtered.sort_values(by='radial_xy', ascending=False)
 
 # Save to CSV
 output_file = "filtered_xy_sorted.csv"
-filtered_sorted.to_csv(output_file, index=False)
+filtered.to_csv(output_file, index=False)
